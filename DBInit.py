@@ -50,24 +50,67 @@ def generate_routers(cur):
     print('-----------------------------------------------')
     print('Starting generating routers...')
 
-    with open('routers', 'r') as f:
+    with open('scraped/routers', 'r') as f:
         routers = f.readlines()
         for router in routers:
-            if router:
-                params = router.split(';')
-                cur.execute(f"""INSERT INTO routers (price, model, frequencies, wifi_standard, ports)
-                        VALUES ({params[0]}, '{params[1]}', '{params[2]}', '{params[3]}', '{params[4]}');""")
+            params = router.split(';')
+            cur.execute(f"""INSERT INTO routers (price, model, frequencies, wifi_standard, ports)
+                    VALUES ({params[0]}, '{params[1]}', '{params[2]}', '{params[3]}', '{params[4]}');""")
 
     print('Routers generated')
 
 
+def generate_int_tariffs(cur):
+    print('-----------------------------------------------')
+    print('Starting generating internet tariffs...')
+    commands = ["""INSERT INTO internet_tariffs (name, speed, price) VALUES ('Basic', 500, 500);""",
+                """INSERT INTO internet_tariffs (name, speed, price) VALUES ('Advanced', 750, 750);""",
+                """INSERT INTO internet_tariffs (name, speed, price) VALUES ('Premium', 1000, 1000);"""]
+    for i in commands:
+        cur.execute(i)
+
+    print('Internet tariffs generated.')
+
+
+def generate_tv_tariffs(cur):
+    print('-----------------------------------------------')
+    print('Starting generating TV tariffs...')
+    commands = ["""INSERT INTO tv_tariffs (name, channels, price, hd_channels) VALUES ('Basic', 80, 150, 20);""",
+                """INSERT INTO tv_tariffs (name, channels, price, hd_channels) VALUES ('Optimal', 150, 200, 40);""",
+                """INSERT INTO tv_tariffs (name, channels, price, hd_channels) VALUES ('Super', 250, 250, 70);"""]
+    for i in commands:
+        cur.execute(i)
+
+    print('TV tariffs generated.')
+
+
+def generate_servers(cur):
+    print('-----------------------------------------------')
+    print('Starting generating servers...')
+
+    with open('scraped/cpu', 'r') as cpu_file:
+        ram_file = open('scraped/ram', 'r')
+        rams = ram_file.readlines()
+        cpus = cpu_file.readlines()
+        for i in range(40):
+            ram_params = random.choice(rams).split(';')
+            cpu_params = random.choice(cpus).split(';')
+            cur.execute(f"""INSERT INTO servers (price, cpu, ram)
+                        VALUES ({int(ram_params[1]) + int(cpu_params[1])}, '{cpu_params[0]}', '{ram_params[0]}');""")
+
+    print('Servers generated')
+
+
 if __name__ == '__main__':
     conn = connect()
-    cur = conn.cursor()
+    cursor = conn.cursor()
 
-    generate_clients(cur)
-    generate_accounts(cur)
-    generate_routers(cur)
+    generate_clients(cursor)
+    generate_accounts(cursor)
+    generate_routers(cursor)
+    generate_int_tariffs(cursor)
+    generate_tv_tariffs(cursor)
+    generate_servers(cursor)
 
     conn.commit()
     conn.close()
