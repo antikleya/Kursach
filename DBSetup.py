@@ -74,8 +74,6 @@ if __name__ == '__main__':
         """
         CREATE TABLE owned_servers (
                 o_server_id SERIAL PRIMARY KEY,
-                cpu TEXT NOT NULL,
-                ram TEXT NOT NULL,
                 location TEXT NOT NULL,
                 server_id INTEGER NOT NULL,
                 FOREIGN KEY (server_id)

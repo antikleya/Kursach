@@ -2,6 +2,14 @@ import psycopg2
 from configparser import ConfigParser
 
 
+def new_order():
+    return {'router': None, 'int_tariff': None, 'tv_tariff': None}
+
+
+def check_order(order):
+    return order['router'] or order['int_tariff'] or order['tv_tariff']
+
+
 def config(filename='database.ini', section='postgresql'):
     # create a parser
     parser = ConfigParser()

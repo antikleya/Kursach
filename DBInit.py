@@ -10,7 +10,7 @@ def generate_clients(cur):
     print('-----------------------------------------------')
     print('Starting generating clients...')
 
-    for i in range(10):
+    for i in range(9900):
         name = fake.name().split()
         n = 1 if len(name) != 3 else 0
 
@@ -31,7 +31,8 @@ def generate_accounts(cur):
     print('-----------------------------------------------')
     print('Starting generating accounts...')
     f = open('users', 'w')
-    for i in range(10):
+    fa = open('admins', 'w')
+    for i in range(9900):
         login = ''.join([chr(random.randint(ord('a'), ord('z'))) for i in range(random.randint(8, 15))])
         password = fake.password(length=12)
         pass_hash = md5(password.encode('utf8')).hexdigest()
@@ -43,6 +44,19 @@ def generate_accounts(cur):
         cur.execute(f"""INSERT INTO accounts (login, pass_hash, creation_date, is_admin, client_id)
                         VALUES ('{login}', '{pass_hash}', '{date}', {is_admin}, {client_id});""")
 
+    for i in range(9900, 10000):
+        login = ''.join([chr(random.randint(ord('a'), ord('z'))) for i in range(random.randint(8, 15))])
+        password = fake.password(length=12)
+        pass_hash = md5(password.encode('utf8')).hexdigest()
+        date = fake.date()
+        is_admin = True
+
+        fa.write(f'{login}:{password}\n')
+        cur.execute(f"""INSERT INTO accounts (login, pass_hash, creation_date, is_admin)
+                                VALUES ('{login}', '{pass_hash}', '{date}', {is_admin});""")
+
+    f.close()
+    fa.close()
     print('Accounts generated.')
 
 
@@ -92,13 +106,48 @@ def generate_servers(cur):
         ram_file = open('scraped/ram', 'r')
         rams = ram_file.readlines()
         cpus = cpu_file.readlines()
-        for i in range(40):
+        for i in range(100):
             ram_params = random.choice(rams).split(';')
             cpu_params = random.choice(cpus).split(';')
             cur.execute(f"""INSERT INTO servers (price, cpu, ram)
                         VALUES ({int(ram_params[1]) + int(cpu_params[1])}, '{cpu_params[0]}', '{ram_params[0]}');""")
 
     print('Servers generated')
+
+
+def generate_contracts(cur):
+    fake = Faker('ru_RU')
+
+    print('-----------------------------------------------')
+    print('Starting generating contracts...')
+
+    for i in range(99500):
+
+        account_id = random.randint(1, 9900)
+        date = fake.date()
+        tariff_id = random.randint(0, 3)
+        tariff_id = tariff_id if tariff_id else None
+        router_id = random.randint(0, 3)
+        router_id = router_id if router_id else None
+        tv_tariff_id = random.randint(0, 3) if tariff_id or router_id else random.randint(1, 3)
+        tv_tariff_id = tv_tariff_id if tv_tariff_id else None
+
+        cur.execute("""INSERT INTO contracts (account_id, date, tariff_id, tv_tariff_id, router_id) 
+                       VALUES (%s, %s, %s, %s, %s)""", (account_id, date, tariff_id, tv_tariff_id, router_id))
+
+    for i in range(500):
+
+        account_id = random.randint(9901, 10000)
+        date = fake.date()
+        server_id = random.randint(1, 100)
+        location = fake.address()
+
+        cur.execute("""INSERT INTO contracts (account_id, date, server_id) 
+                       VALUES (%s, %s, %s)""", (account_id, date, server_id))
+
+        cur.execute("""INSERT INTO owned_servers (location, server_id) VALUES (%s, %s)""", (location, server_id))
+
+    print('Contracts generated')
 
 
 if __name__ == '__main__':
@@ -111,6 +160,7 @@ if __name__ == '__main__':
     generate_int_tariffs(cursor)
     generate_tv_tariffs(cursor)
     generate_servers(cursor)
+    generate_contracts(cursor)
 
     conn.commit()
     conn.close()
