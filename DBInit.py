@@ -79,7 +79,14 @@ def generate_int_tariffs(cur):
     print('Starting generating internet tariffs...')
     commands = ["""INSERT INTO internet_tariffs (name, speed, price) VALUES ('Basic', 500, 500);""",
                 """INSERT INTO internet_tariffs (name, speed, price) VALUES ('Advanced', 750, 750);""",
-                """INSERT INTO internet_tariffs (name, speed, price) VALUES ('Premium', 1000, 1000);"""]
+                """INSERT INTO internet_tariffs (name, speed, price) VALUES ('Premium', 1000, 1000);""",
+                """INSERT INTO internet_tariffs (name, speed, price) VALUES ('Premium2', 2000, 2000);""",
+                """INSERT INTO internet_tariffs (name, speed, price) VALUES ('Premium3', 3000, 3000);""",
+                """INSERT INTO internet_tariffs (name, speed, price) VALUES ('Premium4', 4000, 4000);""",
+                """INSERT INTO internet_tariffs (name, speed, price) VALUES ('Premium5', 5000, 5000);""",
+                """INSERT INTO internet_tariffs (name, speed, price) VALUES ('Premium6', 6000, 6000);""",
+                """INSERT INTO internet_tariffs (name, speed, price) VALUES ('Premium7', 7000, 7000);""",
+                """INSERT INTO internet_tariffs (name, speed, price) VALUES ('Premium8', 8000, 8000);"""]
     for i in commands:
         cur.execute(i)
 
@@ -91,7 +98,14 @@ def generate_tv_tariffs(cur):
     print('Starting generating TV tariffs...')
     commands = ["""INSERT INTO tv_tariffs (name, channels, price, hd_channels) VALUES ('Basic', 80, 150, 20);""",
                 """INSERT INTO tv_tariffs (name, channels, price, hd_channels) VALUES ('Optimal', 150, 200, 40);""",
-                """INSERT INTO tv_tariffs (name, channels, price, hd_channels) VALUES ('Super', 250, 250, 70);"""]
+                """INSERT INTO tv_tariffs (name, channels, price, hd_channels) VALUES ('Super', 250, 250, 70);""",
+                """INSERT INTO tv_tariffs (name, channels, price, hd_channels) VALUES ('Super2', 1250, 1250, 170);""",
+                """INSERT INTO tv_tariffs (name, channels, price, hd_channels) VALUES ('Super3', 2250, 1250, 270);""",
+                """INSERT INTO tv_tariffs (name, channels, price, hd_channels) VALUES ('Super4', 3250, 1250, 370);""",
+                """INSERT INTO tv_tariffs (name, channels, price, hd_channels) VALUES ('Super5', 4250, 1250, 470);""",
+                """INSERT INTO tv_tariffs (name, channels, price, hd_channels) VALUES ('Super6', 5250, 1250, 570);""",
+                """INSERT INTO tv_tariffs (name, channels, price, hd_channels) VALUES ('Super7', 6250, 1250, 670);""",
+                """INSERT INTO tv_tariffs (name, channels, price, hd_channels) VALUES ('Super8', 7250, 1250, 770);"""]
     for i in commands:
         cur.execute(i)
 
@@ -125,11 +139,11 @@ def generate_contracts(cur):
 
         account_id = random.randint(1, 9900)
         date = fake.date()
-        tariff_id = random.randint(0, 3)
+        tariff_id = random.randint(0, 10)
         tariff_id = tariff_id if tariff_id else None
-        router_id = random.randint(0, 3)
+        router_id = random.randint(0, 10)
         router_id = router_id if router_id else None
-        tv_tariff_id = random.randint(0, 3) if tariff_id or router_id else random.randint(1, 3)
+        tv_tariff_id = random.randint(0, 10) if tariff_id or router_id else random.randint(1, 10)
         tv_tariff_id = tv_tariff_id if tv_tariff_id else None
 
         cur.execute("""INSERT INTO contracts (account_id, date, tariff_id, tv_tariff_id, router_id) 

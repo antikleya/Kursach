@@ -17,11 +17,19 @@ admin_token = open('admin_token', 'r').read()
 
 
 def get_max_contracts():
-    cur.execute("""SELECT first_name, last_name, MAX(contract_num) 
-                   FROM (select clients.first_name, clients.last_name, COUNT(contracts.contract_id) AS contract_num
+    cur.execute("""SELECT first_name, last_name, contract_num 
+                   FROM (SELECT clients.first_name, clients.last_name, COUNT(contracts.contract_id) AS contract_num
                    FROM contracts JOIN accounts ON contracts.account_id = accounts.account_id
                    JOIN clients ON accounts.client_id = clients.client_id
-                   GROUP BY first_name, last_name) AS sub_table GROUP BY first_name, last_name;""")
+                   GROUP BY first_name, last_name) AS sub_table
+                   WHERE contract_num = (
+                                        SELECT MAX (contract_num)
+                                        FROM (SELECT COUNT(contracts.contract_id) AS contract_num
+                                              FROM contracts JOIN accounts ON contracts.account_id = accounts.account_id
+                                              JOIN clients ON accounts.client_id = clients.client_id
+                                              GROUP BY first_name, last_name) as cringe
+                                        ) 
+                   GROUP BY first_name, last_name, contract_num;""")
     return ['First name', 'Last name', 'Number of contracts'], cur.fetchall()
 
 
